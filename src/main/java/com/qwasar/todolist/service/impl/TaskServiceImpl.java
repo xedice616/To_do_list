@@ -51,7 +51,21 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public TaskResponseDto updateTask(Long id, TaskRequestDto request) {
-        return null;
+
+        Task task = taskRepository.findById(id)//database den hemin task tapilir
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Task not found with id: " + id));
+
+        task.setTitle(request.getTitle()); //Gələn məlumatlarla köhnə task yenilənir.
+        task.setDescription(request.getDescription());
+        task.setDueDate(request.getDueDate());
+        task.setDueTime(request.getDueTime());
+        task.setPriority(request.getPriority());
+        task.setRepeatType(request.getRepeatType());
+
+        Task updatedTask = taskRepository.save(task); //Hibernate UPDATE sorğusu göndərir.
+
+        return taskMapper.toResponse(updatedTask);//İstifadəçiyə yenilənmiş Task qaytarılır.
     }
 
 
