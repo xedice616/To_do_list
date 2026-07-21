@@ -1,6 +1,7 @@
 package com.qwasar.todolist.controller;
 
 import com.qwasar.todolist.dto.request.TaskRequestDto;
+import com.qwasar.todolist.dto.response.DashboardResponseDto;
 import com.qwasar.todolist.dto.response.TaskResponseDto;
 import com.qwasar.todolist.enums.Priority;
 import com.qwasar.todolist.enums.Status;
@@ -10,10 +11,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+
+@Tag(
+        name = "Task Management",
+        description = "CRUD operations for Task Management System"
+)
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
@@ -21,33 +31,39 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @PostMapping
-    public TaskResponseDto createTask(@Valid @RequestBody TaskRequestDto request) {
-        return taskService.createTask(request);
-    }
 
+
+    @Operation(summary = "Update task")
     @PutMapping("/{id}")
-    public TaskResponseDto updateTask(@PathVariable Long id,
-                                      @Valid @RequestBody TaskRequestDto request) {
+    public TaskResponseDto updateTask(
+            @PathVariable Long id,
+            @Valid @RequestBody TaskRequestDto request) {
+
         return taskService.updateTask(id, request);
     }
 
+    @Operation(summary = "Delete task")
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
+
         taskService.deleteTask(id);
+
+        return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Get task by id")
     @GetMapping("/{id}")
     public TaskResponseDto getTaskById(@PathVariable Long id) {
+
         return taskService.getTaskById(id);
     }
 
+    @Operation(summary = "Get all tasks")
     @GetMapping
     public Page<TaskResponseDto> getAllTasks(Pageable pageable) {
 
         return taskService.getAllTasks(pageable);
     }
-
     @GetMapping("/search/title")
     public Page<TaskResponseDto> searchByTitle(
             @RequestParam String title,
@@ -121,6 +137,36 @@ public class TaskController {
         Pageable pageable = PageRequest.of(page, size);
 
         return taskService.getArchivedTasks(pageable);
+    }
+
+
+
+    @GetMapping("/dashboard")
+    public DashboardResponseDto getDashboardStatistics() {
+        return taskService.getDashboardStatistics();
+    }
+
+
+
+    @PatchMapping("/{id}/favorite")
+    public TaskResponseDto toggleFavorite(@PathVariable Long id) {
+
+        return taskService.toggleFavorite(id);
+    }
+
+    @PatchMapping("/{id}/archive")
+    public TaskResponseDto archiveTask(@PathVariable Long id) {
+
+        return taskService.archiveTask(id);
+    }
+
+    @Operation(summary = "Create a new task")
+    @PostMapping
+    public ResponseEntity<TaskResponseDto> createTask(
+            @Valid @RequestBody TaskRequestDto request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(taskService.createTask(request));
     }
 }
 

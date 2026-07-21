@@ -1,6 +1,7 @@
 package com.qwasar.todolist.service;
 
 import com.qwasar.todolist.dto.request.TaskRequestDto;
+import com.qwasar.todolist.dto.response.DashboardResponseDto;
 import com.qwasar.todolist.dto.response.TaskResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,18 @@ public interface TaskService {
     Page<TaskResponseDto> getFavoriteTasks(Pageable pageable);
 
     Page<TaskResponseDto> getArchivedTasks(Pageable pageable);
+
+
+
+    DashboardResponseDto getDashboardStatistics();
+
+
+
+    TaskResponseDto toggleFavorite(Long id);
+
+
+
+    TaskResponseDto archiveTask(Long id);
 }
 
 

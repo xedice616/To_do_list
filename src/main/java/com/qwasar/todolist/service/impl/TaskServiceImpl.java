@@ -1,6 +1,7 @@
 package com.qwasar.todolist.service.impl;
 
 import com.qwasar.todolist.dto.request.TaskRequestDto;
+import com.qwasar.todolist.dto.response.DashboardResponseDto;
 import com.qwasar.todolist.dto.response.TaskResponseDto;
 import com.qwasar.todolist.entity.Task;
 import com.qwasar.todolist.entity.User;
@@ -16,9 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.qwasar.todolist.enums.Priority;
 import java.time.LocalDate;
-
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 
 @Service
 @RequiredArgsConstructor
@@ -162,6 +160,49 @@ public class TaskServiceImpl implements TaskService {
                 .map(taskMapper::toResponse);
     }
 
+
+
+    @Override
+    public DashboardResponseDto getDashboardStatistics() {
+
+        return DashboardResponseDto.builder()
+                .totalTasks(taskRepository.countByDeletedFalse())
+                .completedTasks(taskRepository.countByDeletedFalseAndStatus(Status.DONE))
+                .pendingTasks(taskRepository.countByDeletedFalseAndStatus(Status.TODO))
+                .inProgressTasks(taskRepository.countByDeletedFalseAndStatus(Status.IN_PROGRESS))
+                .cancelledTasks(taskRepository.countByDeletedFalseAndStatus(Status.CANCELLED))
+                .favoriteTasks(taskRepository.countByDeletedFalseAndFavoriteTrue())
+                .archivedTasks(taskRepository.countByDeletedFalseAndArchivedTrue())
+                .build();
+    }
+
+
+    @Override
+    public TaskResponseDto toggleFavorite(Long id) {
+
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Task not found with id: " + id));
+
+        task.setFavorite(!task.getFavorite());
+        Task updatedTask = taskRepository.save(task);
+
+        return taskMapper.toResponse(updatedTask);
+    }
+
+    @Override
+    public TaskResponseDto archiveTask(Long id) {
+
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Task not found with id: " + id));
+
+        task.setArchived(true);
+
+        Task updatedTask = taskRepository.save(task);
+
+        return taskMapper.toResponse(updatedTask);
+    }
     //1️⃣ User tapılır
     //User user = userRepository.findById(1L)
     //
