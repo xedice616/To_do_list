@@ -1,5 +1,7 @@
 package com.qwasar.todolist.service.impl;
 
+import com.qwasar.todolist.dto.auth.LoginRequestDto;
+import com.qwasar.todolist.dto.auth.LoginResponseDto;
 import com.qwasar.todolist.dto.auth.RegisterRequestDto;
 import com.qwasar.todolist.dto.auth.RegisterResponseDto;
 import com.qwasar.todolist.entity.User;
@@ -41,5 +43,23 @@ public class AuthServiceImpl implements AuthService {
                 savedUser.getEmail(),
                 savedUser.getCreatedAt()
                 );
+    }
+
+    public LoginResponseDto login(LoginRequestDto request) {
+
+        User user = userRepository.findByUsername(request.getUsername()).orElseThrow(
+                () -> new IllegalArgumentException("Invalid username or password")
+        );
+
+        boolean passwordMatches = passwordEncoder.matches(request.getPassword(), user.getPassword());
+
+        if (!passwordMatches) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+
+        return new LoginResponseDto(
+                user.getId(),
+                user.getUsername()
+        );
     }
 }
