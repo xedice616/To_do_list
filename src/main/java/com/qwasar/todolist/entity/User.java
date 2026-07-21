@@ -1,12 +1,19 @@
 package com.qwasar.todolist.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+
 @Entity // Tells the SpringDATA JPA that this is an object that kept in database
+@Getter // this is lombok, helps to create getters and setters automaticaly
+@Setter
+@NoArgsConstructor // this helps us to create no args constructor also.
 @Table(name="users") // The table name that will be created in database
 public class User {
 
@@ -46,44 +53,5 @@ public class User {
             nullable = false
     )
     private LocalDateTime updatedAt;
-
-    public User() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
 
 }
