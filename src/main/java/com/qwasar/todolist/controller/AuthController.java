@@ -1,6 +1,8 @@
 package com.qwasar.todolist.controller;
 
 
+import com.qwasar.todolist.dto.auth.LoginRequestDto;
+import com.qwasar.todolist.dto.auth.LoginResponseDto;
 import com.qwasar.todolist.dto.auth.RegisterRequestDto;
 import com.qwasar.todolist.dto.auth.RegisterResponseDto;
 import com.qwasar.todolist.service.AuthService;
@@ -29,6 +31,15 @@ public class AuthController {
             @RequestBody RegisterRequestDto request
             ) {
         return authService.register(request);
+    }
+
+    @PostMapping("/login")
+    @ResponseStatus(HttpStatus.OK)
+    public LoginResponseDto login(
+            @Valid
+            @RequestBody LoginRequestDto request
+    ) {
+        return authService.login(request);
     }
 
 
