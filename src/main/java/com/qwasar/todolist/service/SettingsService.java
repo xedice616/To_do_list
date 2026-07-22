@@ -7,9 +7,9 @@ import com.qwasar.todolist.entity.User;
 public interface SettingsService {
 
     void createDefaultSettings(User user);
-    SettingsResponseDto getSettings(Long userId);
+    SettingsResponseDto getSettings(String username);
     SettingsResponseDto updateSettings(
-            Long userId,
+            String username,
             SettingsRequestDto request
     );
 }

@@ -18,10 +18,17 @@ public class SettingsServiceImpl implements SettingsService {
     private final UserRepository userRepository;
 
     @Override
-    public SettingsResponseDto getSettings(Long userId) {
-        UserSettings userSettings = userSettingsRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("Settings not found for user with id: " + userId)
-        );
+    public SettingsResponseDto getSettings(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(
+                        () -> new IllegalArgumentException(
+                                "User not found: " + username
+                        )
+                );
+
+        UserSettings userSettings = userSettingsRepository.findByUserId(user.getId()).orElseThrow(
+                        () -> new IllegalArgumentException("Settings not found for user: " + username)
+                        );
 
         return new SettingsResponseDto(
                 userSettings.getId(),
@@ -31,9 +38,17 @@ public class SettingsServiceImpl implements SettingsService {
     }
 
     @Override
-    public SettingsResponseDto updateSettings(Long userId, SettingsRequestDto request) {
-        UserSettings userSettings = userSettingsRepository.findByUserId(userId).orElseThrow(
-                () -> new IllegalArgumentException("Settings not found for user with id: " + userId)
+    public SettingsResponseDto updateSettings(String username, SettingsRequestDto request) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(
+                        () -> new IllegalArgumentException(
+                                "User not found: " + username
+                        )
+                );
+
+        UserSettings userSettings = userSettingsRepository.findByUserId(user.getId()).orElseThrow(
+                () -> new IllegalArgumentException("Settings not found for user" + username)
         );
 
         userSettings.setDarkMode(request.isDarkMode());
@@ -55,6 +70,6 @@ public class SettingsServiceImpl implements SettingsService {
         userSettings.setUser(user);
 
         userSettingsRepository.save(userSettings);
-        
+
     }
 }
