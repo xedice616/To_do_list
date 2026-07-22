@@ -6,6 +6,8 @@ import com.qwasar.todolist.service.SettingsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @Controller
 @ResponseBody
 @RequestMapping("/api/settings")
@@ -17,17 +19,19 @@ public class SettingsController {
         this.settingsService = settingsService;
     }
 
-    @GetMapping("/{userId}")
-    public SettingsResponseDto getSettings(@PathVariable Long userId) {
-        return settingsService.getSettings(userId);
+    @GetMapping
+    public SettingsResponseDto getSettings(
+            Principal principal
+    ) {
+        return settingsService.getSettings(principal.getName());
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping
     public SettingsResponseDto updateSettings(
-            @PathVariable Long userId,
+            Principal principal,
             @RequestBody SettingsRequestDto request
     ) {
-        return settingsService.updateSettings(userId, request);
+        return settingsService.updateSettings(principal.getName(), request);
     }
 
 }
