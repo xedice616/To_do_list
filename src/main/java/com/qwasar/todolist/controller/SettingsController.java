@@ -3,6 +3,7 @@ package com.qwasar.todolist.controller;
 import com.qwasar.todolist.dto.settings.SettingsRequestDto;
 import com.qwasar.todolist.dto.settings.SettingsResponseDto;
 import com.qwasar.todolist.service.SettingsService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,7 @@ public class SettingsController {
     @PutMapping
     public SettingsResponseDto updateSettings(
             Principal principal,
-            @RequestBody SettingsRequestDto request
+            @Valid @RequestBody SettingsRequestDto request
     ) {
         return settingsService.updateSettings(principal.getName(), request);
     }
