@@ -1,4 +1,4 @@
-package com.qwasar.todolist.dto.auth;
+package com.qwasar.todolist.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

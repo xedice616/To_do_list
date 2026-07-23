@@ -1,8 +1,8 @@
 package com.qwasar.todolist.controller;
 
 
-import com.qwasar.todolist.dto.user.ProfileRequestDto;
-import com.qwasar.todolist.dto.user.ProfileResponseDto;
+import com.qwasar.todolist.dto.request.ProfileRequestDto;
+import com.qwasar.todolist.dto.response.ProfileResponseDto;
 import com.qwasar.todolist.service.ProfileService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;

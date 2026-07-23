@@ -1,4 +1,4 @@
-package com.qwasar.todolist.dto.auth;
+package com.qwasar.todolist.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,9 +1,9 @@
 package com.qwasar.todolist.service.impl;
 
-import com.qwasar.todolist.dto.auth.LoginRequestDto;
-import com.qwasar.todolist.dto.auth.LoginResponseDto;
-import com.qwasar.todolist.dto.auth.RegisterRequestDto;
-import com.qwasar.todolist.dto.auth.RegisterResponseDto;
+import com.qwasar.todolist.dto.request.LoginRequestDto;
+import com.qwasar.todolist.dto.response.LoginResponseDto;
+import com.qwasar.todolist.dto.request.RegisterRequestDto;
+import com.qwasar.todolist.dto.response.RegisterResponseDto;
 import com.qwasar.todolist.entity.User;
 import com.qwasar.todolist.repository.UserRepository;
 import com.qwasar.todolist.service.AuthService;

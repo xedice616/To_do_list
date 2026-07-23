@@ -1,6 +1,6 @@
-package com.qwasar.todolist.dto.settings;
+package com.qwasar.todolist.dto.request;
 
-import com.qwasar.todolist.entity.Language;
+import com.qwasar.todolist.enums.Language;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

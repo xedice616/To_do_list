@@ -1,5 +1,6 @@
 package com.qwasar.todolist.entity;
 
+import com.qwasar.todolist.enums.Language;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

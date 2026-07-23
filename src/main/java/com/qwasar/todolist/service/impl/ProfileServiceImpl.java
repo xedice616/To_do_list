@@ -1,7 +1,7 @@
 package com.qwasar.todolist.service.impl;
 
-import com.qwasar.todolist.dto.user.ProfileRequestDto;
-import com.qwasar.todolist.dto.user.ProfileResponseDto;
+import com.qwasar.todolist.dto.request.ProfileRequestDto;
+import com.qwasar.todolist.dto.response.ProfileResponseDto;
 import com.qwasar.todolist.entity.User;
 import com.qwasar.todolist.repository.UserRepository;
 import com.qwasar.todolist.service.ProfileService;

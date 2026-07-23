@@ -1,4 +1,4 @@
-package com.qwasar.todolist.entity;
+package com.qwasar.todolist.enums;
 
 public enum Language {
     AZ,

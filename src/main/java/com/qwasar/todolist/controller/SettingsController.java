@@ -1,7 +1,7 @@
 package com.qwasar.todolist.controller;
 
-import com.qwasar.todolist.dto.settings.SettingsRequestDto;
-import com.qwasar.todolist.dto.settings.SettingsResponseDto;
+import com.qwasar.todolist.dto.request.SettingsRequestDto;
+import com.qwasar.todolist.dto.response.SettingsResponseDto;
 import com.qwasar.todolist.service.SettingsService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;

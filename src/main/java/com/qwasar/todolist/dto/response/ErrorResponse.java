@@ -1,4 +1,4 @@
-package com.qwasar.todolist.exception;
+package com.qwasar.todolist.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
