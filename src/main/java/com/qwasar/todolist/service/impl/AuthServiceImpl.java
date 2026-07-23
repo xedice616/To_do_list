@@ -21,11 +21,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterResponseDto register(RegisterRequestDto request) {
 
-        if (userRepository.existByUsername(request.getUsername())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
 
-        if (userRepository.existByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
 
