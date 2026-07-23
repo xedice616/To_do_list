@@ -3,9 +3,9 @@ spring:
     name: to-do-list
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/todo_list
+    url: ${DB_URL}
     username: postgres
-    password: dozy123
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
