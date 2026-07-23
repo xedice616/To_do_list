@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ProfileResponseDto updateProfile(String currentUsername, ProfileRequestDto request) {
