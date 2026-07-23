@@ -21,12 +21,12 @@ public class ProfileServiceImpl implements ProfileService {
         );
 
         if (!user.getUsername().equals(request.getUsername()) &&
-                userRepository.existByUsername(request.getUsername())) {
+                userRepository.existsByUsername(request.getUsername())) {
             throw new IllegalArgumentException("Username is already taken");
         }
 
         if (!user.getEmail().equals(request.getEmail()) &&
-                userRepository.existByEmail(request.getEmail())) {
+                userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email is already registered.");
         }
 
