@@ -7,6 +7,7 @@ import com.qwasar.todolist.dto.auth.RegisterResponseDto;
 import com.qwasar.todolist.entity.User;
 import com.qwasar.todolist.repository.UserRepository;
 import com.qwasar.todolist.service.AuthService;
+import com.qwasar.todolist.service.SettingsService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SettingsService settingsService;
 
     @Override
     public RegisterResponseDto register(RegisterRequestDto request) {
@@ -37,6 +39,8 @@ public class AuthServiceImpl implements AuthService {
 
         User savedUser = userRepository.save(user);
 
+        settingsService.createDefaultSettings(savedUser);
+
         return new RegisterResponseDto(
                 savedUser.getId(),
                 savedUser.getUsername(),
@@ -45,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
                 );
     }
 
+    @Override
     public LoginResponseDto login(LoginRequestDto request) {
 
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow(
