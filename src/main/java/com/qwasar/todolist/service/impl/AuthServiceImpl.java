@@ -37,9 +37,9 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        settingsService.createDefaultSettings(user);
-
         User savedUser = userRepository.save(user);
+
+        settingsService.createDefaultSettings(savedUser);
 
         return new RegisterResponseDto(
                 savedUser.getId(),
@@ -49,6 +49,7 @@ public class AuthServiceImpl implements AuthService {
                 );
     }
 
+    @Override
     public LoginResponseDto login(LoginRequestDto request) {
 
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow(

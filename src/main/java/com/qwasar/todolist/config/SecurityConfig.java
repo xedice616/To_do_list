@@ -1,5 +1,6 @@
 package com.qwasar.todolist.config;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,10 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        .dispatcherTypeMatchers(
+                                DispatcherType.ERROR
+                        ).permitAll()
+
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login"
@@ -33,8 +38,11 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
-                        .logoutSuccessHandler((request, response, authentication) ->
-                                response.setStatus(HttpStatus.OK.value())
+                        .logoutSuccessHandler(
+                                (request, response, authentication) ->
+                                        response.setStatus(
+                                                HttpStatus.OK.value()
+                                        )
                         )
                 )
 
