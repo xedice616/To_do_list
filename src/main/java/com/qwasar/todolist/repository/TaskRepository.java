@@ -39,6 +39,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             String username,
             Status status,
             Pageable pageable
+
+
     );
 
     Page<Task> findByUser_UsernameAndDeletedFalseAndPriority(
