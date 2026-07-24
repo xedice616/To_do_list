@@ -5,6 +5,7 @@ import com.qwasar.todolist.dto.response.DashboardResponseDto;
 import com.qwasar.todolist.dto.response.TaskResponseDto;
 import com.qwasar.todolist.entity.Task;
 import com.qwasar.todolist.entity.User;
+import com.qwasar.todolist.enums.Priority;
 import com.qwasar.todolist.enums.Status;
 import com.qwasar.todolist.exception.ResourceNotFoundException;
 import com.qwasar.todolist.mapper.TaskMapper;
@@ -15,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.qwasar.todolist.enums.Priority;
+
 import java.time.LocalDate;
 
 @Service
@@ -27,10 +28,16 @@ public class TaskServiceImpl implements TaskService {
     private final TaskMapper taskMapper;
 
     @Override
-    public TaskResponseDto createTask(TaskRequestDto request) {
-
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public TaskResponseDto createTask(
+            String username,
+            TaskRequestDto request
+    ) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found: " + username
+                        )
+                );
 
         Task task = taskMapper.toEntity(request);
 
@@ -38,164 +45,245 @@ public class TaskServiceImpl implements TaskService {
         task.setFavorite(false);
         task.setArchived(false);
         task.setDeleted(false);
-
         task.setUser(user);
 
         Task savedTask = taskRepository.save(task);
 
         return taskMapper.toResponse(savedTask);
-
     }
 
     @Override
-    public TaskResponseDto updateTask(Long id, TaskRequestDto request) {
+    public TaskResponseDto updateTask(
+            String username,
+            Long id,
+            TaskRequestDto request
+    ) {
+        Task task = findOwnedTask(username, id);
 
-        Task task = taskRepository.findById(id)//database den hemin task tapilir
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Task not found with id: " + id));
-
-        task.setTitle(request.getTitle()); //Gələn məlumatlarla köhnə task yenilənir.
+        task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setDueDate(request.getDueDate());
         task.setDueTime(request.getDueTime());
         task.setPriority(request.getPriority());
         task.setRepeatType(request.getRepeatType());
 
-        Task updatedTask = taskRepository.save(task); //Hibernate UPDATE sorğusu göndərir.
-
-        return taskMapper.toResponse(updatedTask);//İstifadəçiyə yenilənmiş Task qaytarılır.
-    }
-
-
-    @Override
-    public Page<TaskResponseDto> searchByTitle(String title, Pageable pageable) {
-
-        return taskRepository
-                .findByDeletedFalseAndTitleContainingIgnoreCase(title, pageable)
-                .map(taskMapper::toResponse);
-    }
-
-
-    @Override
-    public Page<TaskResponseDto> searchByDescription(String description, Pageable pageable) {
-
-        return taskRepository
-                .findByDeletedFalseAndDescriptionContainingIgnoreCase(description, pageable)
-                .map(taskMapper::toResponse);
-    }
-
-
-    @Override
-    public Page<TaskResponseDto> getTasksByStatus(Status status, Pageable pageable) {
-
-        return taskRepository
-                .findByDeletedFalseAndStatus(status, pageable)
-                .map(taskMapper::toResponse);
-    }
-
-
-    @Override
-    public Page<TaskResponseDto> getTasksByPriority(Priority priority, Pageable pageable) {
-
-        return taskRepository
-                .findByDeletedFalseAndPriority(priority, pageable)
-                .map(taskMapper::toResponse);
-    }
-
-
-    @Override
-    public Page<TaskResponseDto> getTasksByDueDate(LocalDate dueDate, Pageable pageable) {
-
-        return taskRepository
-                .findByDeletedFalseAndDueDate(dueDate, pageable)
-                .map(taskMapper::toResponse);
-    }
-
-
-    @Override
-    public Page<TaskResponseDto> getFavoriteTasks(Pageable pageable) {
-
-        return taskRepository
-                .findByDeletedFalseAndFavoriteTrue(pageable)
-                .map(taskMapper::toResponse);
-    }
-
-
-    @Override
-    public Page<TaskResponseDto> getArchivedTasks(Pageable pageable) {
-
-        return taskRepository
-                .findByDeletedFalseAndArchivedTrue(pageable)
-                .map(taskMapper::toResponse);
-    }
-
-    @Override
-    public void deleteTask(Long id) {
-
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Task not found with id: " + id));
-//burada task silinmir sadece dleted = true edilir. bu soft delete adlanir. database de silinmir sadece gizlenir.
-
-        task.setDeleted(true);
-
-        taskRepository.save(task);
-    }
-
-
-    @Override
-    public TaskResponseDto getTaskById(Long id) {
-
-        Task task = taskRepository.findById(id)//hemin id li task database de axtarilir
-                .orElseThrow(() -> //eger tapilmasa bu isleyir. yeni 404 not found xetasi
-                        new ResourceNotFoundException("Task not found with id: " + id));
-
-        return taskMapper.toResponse(task);
-    }
-
-    @Override
-    public Page<TaskResponseDto> getAllTasks(Pageable pageable) {
-        return taskRepository
-                .findByDeletedFalse(pageable)
-                .map(taskMapper::toResponse);
-    }
-
-
-
-    @Override
-    public DashboardResponseDto getDashboardStatistics() {
-
-        return DashboardResponseDto.builder()
-                .totalTasks(taskRepository.countByDeletedFalse())
-                .completedTasks(taskRepository.countByDeletedFalseAndStatus(Status.DONE))
-                .pendingTasks(taskRepository.countByDeletedFalseAndStatus(Status.TODO))
-                .inProgressTasks(taskRepository.countByDeletedFalseAndStatus(Status.IN_PROGRESS))
-                .cancelledTasks(taskRepository.countByDeletedFalseAndStatus(Status.CANCELLED))
-                .favoriteTasks(taskRepository.countByDeletedFalseAndFavoriteTrue())
-                .archivedTasks(taskRepository.countByDeletedFalseAndArchivedTrue())
-                .build();
-    }
-
-
-    @Override
-    public TaskResponseDto toggleFavorite(Long id) {
-
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Task not found with id: " + id));
-
-        task.setFavorite(!task.getFavorite());
         Task updatedTask = taskRepository.save(task);
 
         return taskMapper.toResponse(updatedTask);
     }
 
     @Override
-    public TaskResponseDto archiveTask(Long id) {
+    public void deleteTask(
+            String username,
+            Long id
+    ) {
+        Task task = findOwnedTask(username, id);
 
-        Task task = taskRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Task not found with id: " + id));
+        task.setDeleted(true);
+
+        taskRepository.save(task);
+    }
+
+    @Override
+    public TaskResponseDto getTaskById(
+            String username,
+            Long id
+    ) {
+        Task task = findOwnedTask(username, id);
+
+        return taskMapper.toResponse(task);
+    }
+
+    @Override
+    public Page<TaskResponseDto> getAllTasks(
+            String username,
+            Pageable pageable
+    ) {
+        return taskRepository
+                .findByUser_UsernameAndDeletedFalse(
+                        username,
+                        pageable
+                )
+                .map(taskMapper::toResponse);
+    }
+
+    @Override
+    public Page<TaskResponseDto> searchByTitle(
+            String username,
+            String title,
+            Pageable pageable
+    ) {
+        return taskRepository
+                .findByUser_UsernameAndDeletedFalseAndTitleContainingIgnoreCase(
+                        username,
+                        title,
+                        pageable
+                )
+                .map(taskMapper::toResponse);
+    }
+
+    @Override
+    public Page<TaskResponseDto> searchByDescription(
+            String username,
+            String description,
+            Pageable pageable
+    ) {
+        return taskRepository
+                .findByUser_UsernameAndDeletedFalseAndDescriptionContainingIgnoreCase(
+                        username,
+                        description,
+                        pageable
+                )
+                .map(taskMapper::toResponse);
+    }
+
+    @Override
+    public Page<TaskResponseDto> getTasksByStatus(
+            String username,
+            Status status,
+            Pageable pageable
+    ) {
+        return taskRepository
+                .findByUser_UsernameAndDeletedFalseAndStatus(
+                        username,
+                        status,
+                        pageable
+                )
+                .map(taskMapper::toResponse);
+    }
+
+    @Override
+    public Page<TaskResponseDto> getTasksByPriority(
+            String username,
+            Priority priority,
+            Pageable pageable
+    ) {
+        return taskRepository
+                .findByUser_UsernameAndDeletedFalseAndPriority(
+                        username,
+                        priority,
+                        pageable
+                )
+                .map(taskMapper::toResponse);
+    }
+
+    @Override
+    public Page<TaskResponseDto> getTasksByDueDate(
+            String username,
+            LocalDate dueDate,
+            Pageable pageable
+    ) {
+        return taskRepository
+                .findByUser_UsernameAndDeletedFalseAndDueDate(
+                        username,
+                        dueDate,
+                        pageable
+                )
+                .map(taskMapper::toResponse);
+    }
+
+    @Override
+    public Page<TaskResponseDto> getFavoriteTasks(
+            String username,
+            Pageable pageable
+    ) {
+        return taskRepository
+                .findByUser_UsernameAndDeletedFalseAndFavoriteTrue(
+                        username,
+                        pageable
+                )
+                .map(taskMapper::toResponse);
+    }
+
+    @Override
+    public Page<TaskResponseDto> getArchivedTasks(
+            String username,
+            Pageable pageable
+    ) {
+        return taskRepository
+                .findByUser_UsernameAndDeletedFalseAndArchivedTrue(
+                        username,
+                        pageable
+                )
+                .map(taskMapper::toResponse);
+    }
+
+    @Override
+    public DashboardResponseDto getDashboardStatistics(
+            String username
+    ) {
+        return DashboardResponseDto.builder()
+                .totalTasks(
+                        taskRepository
+                                .countByUser_UsernameAndDeletedFalse(
+                                        username
+                                )
+                )
+                .completedTasks(
+                        taskRepository
+                                .countByUser_UsernameAndDeletedFalseAndStatus(
+                                        username,
+                                        Status.DONE
+                                )
+                )
+                .pendingTasks(
+                        taskRepository
+                                .countByUser_UsernameAndDeletedFalseAndStatus(
+                                        username,
+                                        Status.TODO
+                                )
+                )
+                .inProgressTasks(
+                        taskRepository
+                                .countByUser_UsernameAndDeletedFalseAndStatus(
+                                        username,
+                                        Status.IN_PROGRESS
+                                )
+                )
+                .cancelledTasks(
+                        taskRepository
+                                .countByUser_UsernameAndDeletedFalseAndStatus(
+                                        username,
+                                        Status.CANCELLED
+                                )
+                )
+                .favoriteTasks(
+                        taskRepository
+                                .countByUser_UsernameAndDeletedFalseAndFavoriteTrue(
+                                        username
+                                )
+                )
+                .archivedTasks(
+                        taskRepository
+                                .countByUser_UsernameAndDeletedFalseAndArchivedTrue(
+                                        username
+                                )
+                )
+                .build();
+    }
+
+    @Override
+    public TaskResponseDto toggleFavorite(
+            String username,
+            Long id
+    ) {
+        Task task = findOwnedTask(username, id);
+
+        task.setFavorite(
+                !Boolean.TRUE.equals(task.getFavorite())
+        );
+
+        Task updatedTask = taskRepository.save(task);
+
+        return taskMapper.toResponse(updatedTask);
+    }
+
+    @Override
+    public TaskResponseDto archiveTask(
+            String username,
+            Long id
+    ) {
+        Task task = findOwnedTask(username, id);
 
         task.setArchived(true);
 
@@ -203,6 +291,23 @@ public class TaskServiceImpl implements TaskService {
 
         return taskMapper.toResponse(updatedTask);
     }
+
+    private Task findOwnedTask(
+            String username,
+            Long taskId
+    ) {
+        return taskRepository
+                .findByIdAndUser_UsernameAndDeletedFalse(
+                        taskId,
+                        username
+                )
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Task not found with id: " + taskId
+                        )
+                );
+    }
+}
     //1️⃣ User tapılır
     //User user = userRepository.findById(1L)
     //
@@ -239,6 +344,3 @@ public class TaskServiceImpl implements TaskService {
     //return taskMapper.toResponse(savedTask);
     //
     //İstifadəçiyə TaskResponseDto qaytarılır.
-
-
-}
