@@ -153,8 +153,3 @@ http://localhost:8080/swagger-ui/index.html
 - Xədicə Əhmədova
 - Telman Əsgərov
 
----
-
-# 📄 License
-
-This project was developed for educational purposes.
