@@ -3,8 +3,8 @@ spring:
     name: to-do-list
 
   datasource:
-    url: jdbc:postgresql://localhost:7878/todo_list_db
-    username: postgres
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/todolist}
+    username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
@@ -18,10 +18,12 @@ spring:
       hibernate:
         format_sql: true
 
+server:
+  port: ${PORT:8080}
+
 springdoc:
   api-docs:
     path: /api-docs
 
   swagger-ui:
     path: /swagger-ui.html
-
